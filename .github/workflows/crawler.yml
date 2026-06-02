@@ -1,0 +1,27 @@
+🔄 Action运行编号: ${{ github.run_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 11.工作流汇总输出
+      - name: 📊 生成运行摘要
+        if: always()
+        run: |
+          echo "## 🕷️ IPTV爬虫运行完成" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ⏰ UTC运行时间: $(date '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔄 运行号: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 📝 分支: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f iptv_sources.txt ]; then
+            SOURCE_COUNT=$(($(wc -l < iptv_sources.txt)-1))
+            echo "- 📺 TXT源总数: $SOURCE_COUNT" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f iptv_sources.m3u ]; then
+            M3U_COUNT=$(grep -c "^#EXTINF" iptv_sources.m3u || echo 0)
+            echo "- 🎬 M3U频道数: $M3U_COUNT" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 直链订阅" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/iptv_sources.m3u" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
